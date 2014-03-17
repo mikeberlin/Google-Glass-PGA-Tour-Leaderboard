@@ -7,8 +7,10 @@ Utilizes the Scores and Stats API provided by http://www.sportsdatallc.com. Go t
 
 If you have obtained an API Key from Sports Data make sure you create an api_key.xml file in your Assets directory and set the file's Build Action to AndroidAsset. The xml file should bein the following format:
 
+```api_key.xml
 <?xml version="1.0" encoding="UTF-8" ?>
 <sportsdata apikey="put-your-api-key-here"></sportsdata>
+```
 
 Thanks for checking this out and let me know if you all have any questions!
 
