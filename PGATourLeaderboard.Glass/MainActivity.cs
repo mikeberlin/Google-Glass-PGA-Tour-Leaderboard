@@ -20,10 +20,10 @@ namespace PGATourLeaderboard.Glass
 		{
 			get {
 				if (string.IsNullOrEmpty (_apiKey)) {
-					var apiKeyDoc = XDocument.Load (Assets.Open ("leaderboard_honda_classic.xml")).Descendants ("sportsdata");
+					var apiKeyDoc = XDocument.Load (Application.Context.Assets.Open ("api_key.xml")).Descendants ("sportsdata");
 
 					if (apiKeyDoc != null) {
-						_apiKey = apiKeyDoc.Attributes ().Where (a => a.Name.LocalName == "apikey").FirstOrDefault ();
+						_apiKey = apiKeyDoc.Attributes ().Where (a => a.Name.LocalName == "apikey").FirstOrDefault ().Value;
 					}
 				}
 

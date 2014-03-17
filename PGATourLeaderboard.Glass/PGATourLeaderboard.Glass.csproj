@@ -69,7 +69,6 @@
     <None Include="Resources\AboutResources.txt" />
     <None Include="Assets\AboutAssets.txt" />
     <None Include="Properties\AndroidManifest.xml" />
-    <None Include="Assets\api_key.xml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\layout\" />
@@ -90,5 +89,6 @@
   <ItemGroup>
     <AndroidAsset Include="Assets\leaderboard_honda_classic.xml" />
     <AndroidAsset Include="Assets\tournaments.xml" />
+    <AndroidAsset Include="Assets\api_key.xml" />
   </ItemGroup>
 </Project>
