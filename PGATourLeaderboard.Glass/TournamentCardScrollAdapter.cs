@@ -31,7 +31,7 @@ namespace PGATourLeaderboard.Glass
 
 		public override Android.Views.View GetView (int position, Android.Views.View convertView, Android.Views.ViewGroup parent)
 		{
-			return TournamentCards.ElementAt (position).ToView ();
+			return TournamentCards.ElementAt (position).View;
 		}
 
 		public override int Count {
@@ -41,12 +41,7 @@ namespace PGATourLeaderboard.Glass
 			}
 		}
 
-		public override int FindIdPosition (Java.Lang.Object id)
-		{
-			return -1;
-		}
-
-		public override int FindItemPosition (Java.Lang.Object item)
+		public override int GetPosition (Java.Lang.Object item)
 		{
 			if (item.GetType () == typeof(Card)) {
 				return TournamentCards.ToList ().IndexOf (item as Card);

@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
+using System.Threading.Tasks;
 
-namespace PGATourLeaderboard.Glass
+namespace PGATourLeaderboard.Glass.Models
 {
 	public class Player
 	{
@@ -18,7 +19,6 @@ namespace PGATourLeaderboard.Glass
 		public int Strokes { get; set; }
 		public double Money { get; set; }
 		public double Points { get; set; }
-		public IEnumerable<Round> Rounds { get; set; }
 
 		public string ScoreDisplay
 		{
@@ -35,10 +35,6 @@ namespace PGATourLeaderboard.Glass
 		#endregion
 
 		#region Constructors
-
-		public Player ()
-		{
-		}
 
 		public Player (XElement t)
 		{
@@ -63,6 +59,54 @@ namespace PGATourLeaderboard.Glass
 			Points = (points == null) ? 0 : double.Parse (points.Value);
 
 			// TODO: Fill in Rounds property...
+		}
+
+		#endregion
+	}
+
+	public class PlayerManager
+	{
+		#region Properties, Constants, etc.
+
+		private readonly string PlayerScoresBaseUri = "https://api.sportsdatallc.org/golf-t1/leaderboard/pga/2014/tournaments/{0}/leaderboard.xml?api_key={1}";
+		private readonly XNamespace PlayerScoreNamespace = "http://feed.elasticstats.com/schema/golf/tournament/leaderboard-v1.0.xsd";
+
+		public int TournamentId { get; set; }
+		public IEnumerable<Player> PlayerScores { get; set; }
+
+		#endregion
+
+		#region Constructors
+
+		public PlayerManager (int tournamentId)
+		{
+			TournamentId = tournamentId;
+		}
+
+		#endregion
+
+		#region Public Methods
+
+		public async Task<IEnumerable<Player>> GetPlayerScores ()
+		{
+			PlayerScores = await Task.Factory.StartNew (() => {
+				if (PlayerScores == null) {
+					var playerScoresUri = string.Format (PlayerScoresBaseUri, TournamentId, MainActivity.API_KEY);
+
+					Console.WriteLine ("playerScoresUri: " + playerScoresUri);
+
+					//_playerScores = XDocument.Load (Assets.Open("leaderboard_honda_classic.xml"))
+					PlayerScores = XDocument.Load (playerScoresUri)
+					.Descendants (PlayerScoreNamespace + "leaderboard")
+					.Descendants (PlayerScoreNamespace + "player")
+					.Select (ps => new Player (ps))
+					.ToList ();
+				}
+
+				return PlayerScores;
+			});
+
+			return PlayerScores;
 		}
 
 		#endregion

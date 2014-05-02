@@ -6,37 +6,18 @@ using Android.Content;
 using Android.Glass.App;
 using Android.Glass.Widget;
 using Android.OS;
+using GlassProgressBar;
+using PGATourLeaderboard.Glass.Models;
 
 namespace PGATourLeaderboard.Glass
 {
 	[Activity (Label = "Tournament Scores")]			
-	public class TournamentScores : Activity
+	public class TournamentScores : BaseActivity
 	{
 		#region Properties and Constants
 
-		private readonly string PlayerScoresBaseUri = "https://api.sportsdatallc.org/golf-t1/leaderboard/pga/2014/tournaments/{0}/leaderboard.xml?api_key={1}";
-		private readonly XNamespace PlayerScoreNamespace = "http://feed.elasticstats.com/schema/golf/tournament/leaderboard-v1.0.xsd";
-
-		private CardScrollView ScoresScrollView { get; set; }
-		private string TournamentId { get; set; }
-
-		private IList<Player> _playerScores;
-		private IList<Player> PlayerScores {
-			get {
-				if (_playerScores == null) {
-					var playerScoresUri = string.Format(PlayerScoresBaseUri, TournamentId, MainActivity.API_KEY);
-
-					//_playerScores = XDocument.Load (Assets.Open("leaderboard_honda_classic.xml"))
-					_playerScores = XDocument.Load (playerScoresUri)
-						.Descendants (PlayerScoreNamespace + "leaderboard")
-						.Descendants (PlayerScoreNamespace + "player")
-						.Select (ps => new Player (ps))
-						.ToList ();
-				}
-
-				return _playerScores;
-			}
-		}
+		private CardScrollView _scoresScrollView { get; set; }
+		private IList<Player> _playerScores { get; set; }
 
 		#endregion
 
@@ -46,47 +27,61 @@ namespace PGATourLeaderboard.Glass
 		{
 			base.OnCreate (bundle);
 
-			TournamentId = Intent.GetStringExtra ("Tournament Id") ?? string.Empty;
+			//var loading = FindViewById<SliderView> (Resource.Id.loading_slider);
+			//loading.StartIndeterminate ();
 
-			if (PlayerScores.Count > 0) {
-				ScoresScrollView = new CardScrollView (this);
-				ScoresScrollView.Adapter = new TournamentCardScrollAdapter (SetupPlayerScoreCards ());
-				ScoresScrollView.Activate ();
+			int tournamentId = 0;
+			int.TryParse (Intent.GetStringExtra ("Tournament Id"), out tournamentId);
 
-				// TODO: Future release to display more details on player's rounds in tournament?
-				/*
-			ScoresScrollView.ItemClick += (object sender, Android.Widget.AdapterView.ItemClickEventArgs e) => {
-				var scoreIntent = new Intent (this, typeof(TournamentScores));
-
-				if (PlayerScores.Count >= ScoresScrollView.SelectedItemPosition) {
-					var playerId = PlayerScores[ScoresScrollView.SelectedItemPosition].Id.ToString ();
-					scoreIntent.PutExtra ("Player Id", playerId);
-				}
-
-				StartActivity (scoreIntent);
-			};
-			*/
-
-				SetContentView (ScoresScrollView);
-			} else {
-				var card = new Card (this);
-				card.SetText ("No player scores found...");
-				card.SetFootnote ("There may have been an error or the tournament has not started yet.");
-
-				SetContentView (card.ToView ());
-			}
+			LoadPlayerScores (tournamentId);
 		}
 
 		#endregion
 
 		#region Private methods
 
+		private async void LoadPlayerScores (int tournamentId)
+		{
+			_playerScores = await new PlayerManager (tournamentId).GetPlayerScores () as List<Player>;
+
+			if (_playerScores.Count > 0) {
+				_scoresScrollView = new CardScrollView (this);
+				_scoresScrollView.Adapter = new TournamentCardScrollAdapter (SetupPlayerScoreCards ());
+				_scoresScrollView.Activate ();
+
+				/*
+				// TODO: Future release to display more details on player's rounds in tournament?
+				_scoresScrollView.ItemClick += (object sender, Android.Widget.AdapterView.ItemClickEventArgs e) => {
+					var scoreIntent = new Intent (this, typeof(TournamentScores));
+
+					if (_playerScores.Count >= _scoresScrollView.SelectedItemPosition) {
+						var playerId = _playerScores[_scoresScrollView.SelectedItemPosition].Id.ToString ();
+						scoreIntent.PutExtra ("Player Id", playerId);
+					}
+
+					StartActivity (scoreIntent);
+				};
+				*/
+
+				SetContentView (_scoresScrollView);
+			} else {
+				var card = new Card (this);
+				card.SetText ("No player scores found...");
+				card.SetFootnote ("There may have been an error or the tournament has not started yet.");
+
+				SetContentView (card.View);
+			}
+
+			//var loading = FindViewById<SliderView> (Resource.Id.loading_slider);
+			//loading.StopIndeterminate ();
+		}
+
 		private IEnumerable<Card> SetupPlayerScoreCards ()
 		{
 			List<Card> playerScoreCards = new List<Card> ();
 
-			if (PlayerScores.Count > 0) {
-				foreach (Player p in PlayerScores) {
+			if (_playerScores.Count > 0) {
+				foreach (Player p in _playerScores) {
 					Card playerScore = new Card (this);
 					playerScore.SetText (string.Format ("{0} {1}\n{2}", p.FirstName, p.LastName, p.ScoreDisplay));
 					playerScore.SetFootnote (string.Format ("Total strokes: {0}", p.Strokes));

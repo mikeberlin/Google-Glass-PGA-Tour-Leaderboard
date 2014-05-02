@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Xml.Linq;
 using System.Linq;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace PGATourLeaderboard.Glass
+namespace PGATourLeaderboard.Glass.Models
 {
 	public class Tournament
 	{
@@ -41,6 +43,41 @@ namespace PGATourLeaderboard.Glass
 			FedExPoints = (fedExPoints == null) ? 0 : int.Parse (fedExPoints.Value);
 			StartDate = (startDate == null) ? DateTime.MinValue : DateTime.Parse (startDate.Value);
 			EndDate = (endDate == null) ? DateTime.MaxValue : DateTime.Parse (endDate.Value);
+		}
+
+		#endregion
+	}
+
+	public static class TournamentManager
+	{
+		#region Properties, Constants, etc.
+
+		private static readonly string TournamentsUri = "https://api.sportsdatallc.org/golf-t1/schedule/pga/2014/tournaments/schedule.xml?api_key={0}";
+		private static readonly XNamespace TournamentsNamespace = "http://feed.elasticstats.com/schema/golf/schedule-v1.0.xsd";
+
+		public static IEnumerable<Tournament> Tournaments { get; set; }
+		public static bool IsLoadingTournaments { get; set; }
+
+		#endregion
+
+		#region Public Methods
+
+		public static async Task<IEnumerable<Tournament>> GetTournaments ()
+		{
+			if (Tournaments == null && IsLoadingTournaments != true) {
+				IsLoadingTournaments = true;
+
+				//Tournaments = XDocument.Load (Assets.Open("tournaments.xml"))
+				Tournaments = await Task.Factory.StartNew(() => {
+					return XDocument.Load (string.Format (TournamentsUri, MainActivity.API_KEY))
+						.Descendants (TournamentsNamespace + "tournament")
+						.Select (t => new Tournament (t))
+						.ToList ();
+				});
+				IsLoadingTournaments = false;
+			}
+
+			return Tournaments;
 		}
 
 		#endregion

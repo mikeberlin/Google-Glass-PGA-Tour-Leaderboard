@@ -5,6 +5,7 @@ using Android.App;
 using Android.Glass.App;
 using Android.OS;
 using Android.Views;
+using PGATourLeaderboard.Glass.Models;
 
 namespace PGATourLeaderboard.Glass
 {
@@ -43,7 +44,8 @@ namespace PGATourLeaderboard.Glass
 			card.SetText ("Welcome to the PGA Tour Leaderboard!");
 			card.SetFootnote ("Tap to see the list of tournaments...");
 
-			SetContentView (card.ToView ());
+			SetContentView (card.View);
+			LoadTournaments ();
 		}
 
 		public override bool OnKeyDown (Keycode keyCode, KeyEvent e)
@@ -54,6 +56,17 @@ namespace PGATourLeaderboard.Glass
 			}
 
 			return base.OnKeyDown (keyCode, e);
+		}
+
+		#endregion
+
+		#region Private Methods
+
+		private async void LoadTournaments ()
+		{
+			// start loading the tournaments as soon as the card is displayed
+			TournamentManager.IsLoadingTournaments = false;
+			await TournamentManager.GetTournaments ();
 		}
 
 		#endregion

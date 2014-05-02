@@ -45,10 +45,10 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="Mono.Android" />
-    <Reference Include="GoogleGlassBindings">
-      <HintPath>..\Components\googleglass-1.1\lib\android\GoogleGlassBindings.dll</HintPath>
-    </Reference>
     <Reference Include="System.Xml.Linq" />
+    <Reference Include="GoogleGlassBindings">
+      <HintPath>..\Components\googleglass-1.6\lib\android\GoogleGlassBindings.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainActivity.cs" />
@@ -59,8 +59,8 @@
     <Compile Include="Models\Tournament.cs" />
     <Compile Include="TournamentScores.cs" />
     <Compile Include="Models\Player.cs" />
-    <Compile Include="Models\Round.cs" />
     <Compile Include="LoadingFragment.cs" />
+    <Compile Include="BaseActivity.cs" />
   </ItemGroup>
   <ItemGroup>
     <AndroidEnvironment Include="AndroidEnvironments.txt" />
@@ -78,17 +78,28 @@
     <AndroidResource Include="Resources\values\Strings.xml" />
     <AndroidResource Include="Resources\xml\VoiceTriggerStart.xml" />
     <AndroidResource Include="Resources\drawable\Icon.png" />
+    <AndroidResource Include="Resources\layout\loading.axml" />
+    <AndroidResource Include="Resources\values\dimens.xml" />
+    <AndroidResource Include="Resources\layout\main_layout.axml" />
+    <AndroidResource Include="Resources\values\themes.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
-  <ItemGroup>
-    <XamarinComponentReference Include="googleglass">
-      <Version>1.1</Version>
-      <Visible>False</Visible>
-    </XamarinComponentReference>
-  </ItemGroup>
   <ItemGroup>
     <AndroidAsset Include="Assets\leaderboard_honda_classic.xml" />
     <AndroidAsset Include="Assets\tournaments.xml" />
     <AndroidAsset Include="Assets\api_key.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\glass-progress-bar\GlassProgressBar\GlassProgressBar.csproj">
+      <Project>{B89D7882-FB37-468F-89DC-ED3652D01B1B}</Project>
+      <Name>GlassProgressBar</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <XamarinComponentReference Include="googleglass">
+      <InstallationInProgress>True</InstallationInProgress>
+      <Version>1.6</Version>
+      <Visible>False</Visible>
+    </XamarinComponentReference>
   </ItemGroup>
 </Project>
